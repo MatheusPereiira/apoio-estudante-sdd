@@ -1,0 +1,29 @@
+name: Harness Evals — EV01..EV04 (T17 / CT06–CT08)
+
+on:
+  pull_request:
+    paths:
+      - "harness/**"
+      - "docs/harness-spec.md"
+  push:
+    branches: [main, develop]
+
+jobs:
+  harness-evals:
+    name: Executar Evals EV01..EV04 (Timeout, Orçamento, Plano M1, PathGuard & PII)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install
+      - run: pnpm test:harness

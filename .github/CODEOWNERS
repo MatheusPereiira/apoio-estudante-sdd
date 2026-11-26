@@ -1,0 +1,17 @@
+# Matriz CODEOWNERS — Constituição C5 / Seção 4 de docs/constitution.md
+# Nenhum merge em main sem aprovação humana do responsável da área.
+
+/docs/constitution.md            @MatheusPereiira
+/docs/prd.md                     @MatheusPereiira
+/docs/ui-ux-spec.md              @MatheusPereiira
+/docs/pre-game.md                @MatheusPereiira
+/docs/harness-spec.md            @MatheusPereiira
+/harness/**                      @MatheusPereiira
+/packages/domain/**              @MatheusPereiira
+/packages/application/**         @MatheusPereiira
+/packages/contracts/**           @MatheusPereiira
+/packages/infrastructure/**      @MatheusPereiira
+/apps/web/**                     @MatheusPereiira
+/packages/db/**                  @MatheusPereiira
+/.github/workflows/**            @MatheusPereiira
+/.devcontainer/**                @MatheusPereiira
