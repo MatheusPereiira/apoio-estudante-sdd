@@ -1,0 +1,21 @@
+Bloco,Item,Papel_ou_Modelo,Quantidade_Horas_ou_M_Tokens_In,Taxa_R$_ou_Preco_USD_In,M_Tokens_Out,Preco_USD_Out,Cambio_c_IOF,Subtotal_R$,Formula_Explicita
+Pessoas,FDE - Produto e Implantacao,FDE,38,140,0,0,1,5320.00,=D2*E2
+Pessoas,AI Engineer - Harness,AI Engineer,39,160,0,0,1,6240.00,=D3*E3
+Pessoas,Software Engineer - Integracoes,Software Engineer,40,110,0,0,1,4400.00,=D4*E4
+Pessoas,Platform / LLMOps - Qualidade,Platform Engineer,39,130,0,0,1,5070.00,=D5*E5
+Subtotal_Pessoas,Soma Mao de Obra Humana,Equipe (156h de 160h),156,0,0,0,1,21030.00,=SUM(I2:I5)
+IA_API,M1 - Planejamento e Revisao (OpenAI gpt-5),gpt-5,6.40,1.25,0.54,10.00,5.6925,76.28,=((D7*E7)+(F7*G7))*H7
+IA_API,M2 - Execucao e Evals (Anthropic claude-sonnet-4-5),claude-sonnet-4-5,53.50,3.00,4.20,15.00,5.6925,1272.27,=((D8*E8)+(F8*G8))*H8
+IA_API,M3 - Triagem e Fixtures (Google gemini-2.5-flash),gemini-2.5-flash,0.80,0.30,0.08,2.50,5.6925,2.50,=((D9*E9)+(F9*G9))*H9
+Subtotal_API,Soma Consumo de API LLMs (US$ 237.34),3 Modelos,60.70,0,4.82,0,5.6925,1351.06,=SUM(I7:I9)
+IA_Licencas,Licencas de Ferramentas IA (4 integrantes x 1 mes),Fixo Mensal,1,600,0,0,1,600.00,=D11*E11
+Infra_Construcao,Infraestrutura de Dev Testes e Sandbox (1 mes),Fixo Mensal,1,300,0,0,1,300.00,=D12*E12
+Custo_Base_Construcao,Subtotal de Construcao sem Reserva,Base,0,0,0,0,1,23281.06,=I6+I10+I11+I12
+Reserva_10_Pct,Reserva para Imprevistos (10% da Base),Reserva 10%,0.10,23281.06,0,0,1,2328.11,=I13*0.10
+Total_Construcao_c_Reserva,Custo Total Estimado de Construcao (Base x 1.10),Total Construcao,1.10,23281.06,0,0,1,25609.17,=I13+I14
+Sensibilidade_50_Pct_Tokens,Custo Total de Construcao com +50% de Tokens,Sensibilidade +50% API,1.50,1351.06,0,0,1,26352.25,=(I6+(I10*1.5)+I11+I12)*1.10
+Operacao_Mensal,Infraestrutura Producao (Vercel Pro + Neon + Dominio),Mensal,1,350,0,0,1,350.00,=D17*E17
+Operacao_Mensal,Suporte e Operacao Assistida (4h Plat + 4h SW),Mensal,8,120,0,0,1,960.00,=(4*130)+(4*110)
+Operacao_Mensal,Tokens Harness Manutencao (~10 tarefas/mes),Mensal,1,150,0,0,1,150.00,=D19*E19
+Total_Operacao_Mensal,Custo Mensal de Operacao Pos-Entrega,Mensal,1,1460,0,0,1,1460.00,=SUM(I17:I19)
+Total_Operacao_3_Meses,Projecao dos 3 Primeiros Meses Pos-Entrega,Trimestral,3,1460,0,0,1,4380.00,=I20*3
