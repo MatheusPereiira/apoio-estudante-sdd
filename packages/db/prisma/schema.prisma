@@ -1,0 +1,182 @@
+// Modelagem Prisma PostgreSQL 16 — rastreável a docs/data-model.md (spec-v1.1.0)
+// Tarefa T07 (Risco A): 7 tabelas, isolamento por usuario_id (RN01), NUMERIC exato (RN07),
+// controle otimista (RN16), histórico imutável (RN11) e exclusão LGPD em cascata (RN17).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MetodoCalculo {
+  SIMPLES
+  PONDERADA
+
+  @@map("metodo_calculo")
+}
+
+enum AcaoNota {
+  LANCADA
+  ALTERADA
+  REMOVIDA
+
+  @@map("acao_nota")
+}
+
+enum TipoAlvoNota {
+  REGULAR
+  SUBSTITUTIVA
+  EXAME_FINAL
+
+  @@map("tipo_alvo_nota")
+}
+
+model Usuario {
+  id               String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nome             String            @db.VarChar(120)
+  email            String            @unique @db.Citext
+  senhaHash        String            @map("senha_hash") @db.VarChar(255)
+  termosVersao     String            @map("termos_versao") @db.VarChar(20)
+  termosAceitosEm  DateTime          @default(now()) @map("termos_aceitos_em") @db.Timestamptz(6)
+  tentativasFalhas Int               @default(0) @map("tentativas_falhas") @db.SmallInt
+  bloqueadoAte     DateTime?         @map("bloqueado_ate") @db.Timestamptz(6)
+  criadoEm         DateTime          @default(now()) @map("criado_em") @db.Timestamptz(6)
+  atualizadoEm     DateTime          @updatedAt @map("atualizado_em") @db.Timestamptz(6)
+
+  sessoes          Sessao[]
+  periodos         PeriodoLetivo[]
+  disciplinas      Disciplina[]
+  avaliacoes       Avaliacao[]
+  historicos       HistoricoNota[]
+  eventosAuditoria EventoAuditoria[]
+
+  @@map("usuario")
+}
+
+model Sessao {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuarioId        String    @map("usuario_id") @db.Uuid
+  familiaId        String    @map("familia_id") @db.Uuid
+  refreshTokenHash String    @unique @map("refresh_token_hash") @db.Char(64)
+  userAgent        String?   @map("user_agent") @db.VarChar(255)
+  ipHash           String?   @map("ip_hash") @db.Char(64)
+  expiraEm         DateTime  @map("expira_em") @db.Timestamptz(6)
+  revogadaEm       DateTime? @map("revogada_em") @db.Timestamptz(6)
+  criadoEm         DateTime  @default(now()) @map("criado_em") @db.Timestamptz(6)
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([familiaId])
+  @@index([expiraEm])
+  @@map("sessao")
+}
+
+model PeriodoLetivo {
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuarioId    String       @map("usuario_id") @db.Uuid
+  nome         String       @db.VarChar(40)
+  dataInicio   DateTime?    @map("data_inicio") @db.Date
+  dataFim      DateTime?    @map("data_fim") @db.Date
+  versao       Int          @default(1)
+  criadoEm     DateTime     @default(now()) @map("criado_em") @db.Timestamptz(6)
+  atualizadoEm DateTime     @updatedAt @map("atualizado_em") @db.Timestamptz(6)
+
+  usuario     Usuario      @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  disciplinas Disciplina[]
+
+  @@unique([id, usuarioId])
+  @@index([usuarioId, criadoEm(sort: Desc)])
+  @@map("periodo_letivo")
+}
+
+model Disciplina {
+  id                   String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuarioId            String        @map("usuario_id") @db.Uuid
+  periodoId            String        @map("periodo_id") @db.Uuid
+  nome                 String        @db.VarChar(120)
+  codigo               String?       @db.VarChar(20)
+  metodoCalculo        MetodoCalculo @default(PONDERADA) @map("metodo_calculo")
+  notaMinimaAprovacao  Decimal       @default(6.00) @map("nota_minima_aprovacao") @db.Decimal(4, 2)
+  casasDecimais        Int           @default(1) @map("casas_decimais") @db.SmallInt
+  permiteSubstitutiva  Boolean       @default(true) @map("permite_substitutiva")
+  notaSubstitutiva     Decimal?      @map("nota_substitutiva") @db.Decimal(4, 2)
+  notaSubstitutivaEm   DateTime?     @map("nota_substitutiva_em") @db.Timestamptz(6)
+  permiteExameFinal    Boolean       @default(true) @map("permite_exame_final")
+  notaMinimaExame      Decimal       @default(4.00) @map("nota_minima_exame") @db.Decimal(4, 2)
+  mediaAprovacaoExame  Decimal       @default(5.00) @map("media_aprovacao_exame") @db.Decimal(4, 2)
+  notaExame            Decimal?      @map("nota_exame") @db.Decimal(4, 2)
+  notaExameEm          DateTime?     @map("nota_exame_em") @db.Timestamptz(6)
+  versao               Int           @default(1)
+  criadoEm             DateTime      @default(now()) @map("criado_em") @db.Timestamptz(6)
+  atualizadoEm         DateTime      @updatedAt @map("atualizado_em") @db.Timestamptz(6)
+
+  usuario    Usuario         @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  periodo    PeriodoLetivo   @relation(fields: [periodoId, usuarioId], references: [id, usuarioId], onDelete: Cascade)
+  avaliacoes Avaliacao[]
+  historicos HistoricoNota[]
+
+  @@unique([id, usuarioId])
+  @@index([usuarioId, periodoId])
+  @@map("disciplina")
+}
+
+model Avaliacao {
+  id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuarioId            String    @map("usuario_id") @db.Uuid
+  disciplinaId         String    @map("disciplina_id") @db.Uuid
+  nome                 String    @db.VarChar(80)
+  peso                 Decimal   @db.Decimal(5, 2)
+  nota                 Decimal?  @db.Decimal(4, 2)
+  notaLancadaEm        DateTime? @map("nota_lancada_em") @db.Timestamptz(6)
+  elegivelSubstitutiva Boolean   @default(true) @map("elegivel_substitutiva")
+  dataPrevista         DateTime? @map("data_prevista") @db.Date
+  ordem                Int       @default(0) @db.SmallInt
+  versao               Int       @default(1)
+  criadoEm             DateTime  @default(now()) @map("criado_em") @db.Timestamptz(6)
+  atualizadoEm         DateTime  @updatedAt @map("atualizado_em") @db.Timestamptz(6)
+
+  usuario    Usuario         @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  disciplina Disciplina      @relation(fields: [disciplinaId, usuarioId], references: [id, usuarioId], onDelete: Cascade)
+  historicos HistoricoNota[]
+
+  @@index([disciplinaId, ordem])
+  @@map("avaliacao")
+}
+
+model HistoricoNota {
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuarioId    String       @map("usuario_id") @db.Uuid
+  disciplinaId String       @map("disciplina_id") @db.Uuid
+  avaliacaoId  String?      @map("avaliacao_id") @db.Uuid
+  tipoAlvo     TipoAlvoNota @default(REGULAR) @map("tipo_alvo")
+  acao         AcaoNota
+  notaAnterior Decimal?     @map("nota_anterior") @db.Decimal(4, 2)
+  notaNova     Decimal?     @map("nota_nova") @db.Decimal(4, 2)
+  criadoEm     DateTime     @default(now()) @map("criado_em") @db.Timestamptz(6)
+
+  usuario    Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  disciplina Disciplina @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
+  avaliacao  Avaliacao? @relation(fields: [avaliacaoId], references: [id], onDelete: Cascade)
+
+  @@index([disciplinaId, criadoEm(sort: Desc)])
+  @@index([avaliacaoId, criadoEm(sort: Desc)])
+  @@map("historico_nota")
+}
+
+model EventoAuditoria {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuarioId String?  @map("usuario_id") @db.Uuid
+  tipo      String   @db.VarChar(60)
+  metadados Json     @default("{}")
+  criadoEm  DateTime @default(now()) @map("criado_em") @db.Timestamptz(6)
+
+  usuario Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  @@index([usuarioId, criadoEm(sort: Desc)])
+  @@index([tipo, criadoEm(sort: Desc)])
+  @@map("evento_auditoria")
+}
