@@ -38,6 +38,10 @@ Toda a engenharia deste repositório é orientada pelas especificações version
 - [**`docs/tasks.md`**](./docs/tasks.md) — **Plano de Implementação e Release Plan:** Alocação da equipe (`156h / 160h`), 8 Épicos, 54 tarefas atômicas (`T00`–`T53`), grafo de caminho crítico, Releases `R0`, `R1` e `R2`, e análise de mudança de requisito (`MR-01`: Controle de Frequência/Faltas `< 75%`).
 - [**`docs/budget-and-changes.md`**](./docs/budget-and-changes.md) & [**`docs/budget.csv`**](./docs/budget.csv) — **Orçamento Detalhado e Planilha com Fórmulas:** Memória de cálculo Parte 1 (`R$ 18.150,00`) vs. Parte 2 (`R$ 25.609,17` construção c/ reserva + `R$ 4.380,00` operação 3 meses), sensibilidade a `+50% tokens` (`R$ 26.352,25`), planilha CSV com fórmulas explícitas e matriz dos **4 Eventos de Replanejamento**.
 
+### Acompanhamento de Sprints e Entrega Final (R4)
+- [**`docs/registro-entregas-r0-r2.md`**](./docs/registro-entregas-r0-r2.md) — **Relatório do que Foi Feito (R0 → R2):** Resumo executivo, histórico completo dos commits incrementais, arquitetura implementada (Visão A + Visão B) e evidências reais de lint, typecheck, testes, cobertura e build.
+- [**`docs/proximos-passos-r4.md`**](./docs/proximos-passos-r4.md) — **Plano da Próxima Etapa (R4 — 03/12/2026):** Roteiro detalhado por frente (deploy Neon/Vercel, E2E Playwright, carga k6, piloto, fechamento `L-12`/`L-13`, fluxo Git para os demais integrantes e roteiro da apresentação final).
+
 ---
 
 ## 3. Equipe e Papéis (Simulação Parte 2)
