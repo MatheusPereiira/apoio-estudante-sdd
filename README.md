@@ -1,6 +1,6 @@
 # Plataforma de Apoio ao Estudante Universitário — SDD + Agent Harness Engineering
 
-> **Status Atual:** `spec-v1.1.0` (Especificação SDD 100% Concluída — Marco Zero-Código)
+> **Status Atual:** `v1.1.0` (Especificação SDD + Implementação Completa R0 → R2 na branch `develop`)
 > **Metodologia:** Spec-Driven Development (GitHub Spec Kit) + Agent Harness Engineering (LangGraph Deep Agents) + Política de Múltiplas LLMs (`OpenAI gpt-5`, `Anthropic claude-sonnet-4-5`, `Google gemini-2.5-flash`).
 
 ---
@@ -48,3 +48,35 @@ Toda a engenharia deste repositório é orientada pelas especificações version
 | **AI Engineer / Harness** | Orquestração LangGraph, roteamento M1/M2/M3, contexto, limites e evals `EV01`–`EV04` | R$ 160/h | 39 h / 40 h |
 | **Software Engineer / Integrações** | Arquitetura da aplicação, motor `@app/domain`, APIs, banco e code review técnico | R$ 110/h | 40 h / 40 h |
 | **Platform / LLMOps e Qualidade** | Sandbox isolado, CI/CD, observabilidade, suíte IDOR, testes de carga e rollback | R$ 130/h | 39 h / 40 h |
+
+---
+
+## 4. Implementação do Sistema (Releases R0 → R2)
+
+O monorepo implementa integralmente as duas visões especificadas em `docs/architecture.md`:
+
+- **Visão A (Aplicação Web + API):**
+  - `packages/domain` (`@app/domain`): motor puro de cálculo com `decimal.js` (`SIMPLES`, `PONDERADA`, Prova Substitutiva `RN19`, Exame Final `RN20`/`RN21`, Nota Necessária `RN10`, 12 situações `RF15`) e **6 propriedades invariantes `fast-check`** (`CT01`, `CT02`).
+  - `packages/contracts` (`@app/contracts`): schemas Zod, Problem Details (RFC 9457) e gerador OpenAPI 3.1 dos **35 endpoints (`E01`–`E35`)**.
+  - `packages/db` (`@app/db`): schema Prisma PostgreSQL 16 (7 tabelas), migração SQL com constraint trigger `RN03` e seeds sintéticos `@example.test`.
+  - `packages/application` & `packages/infrastructure`: casos de uso isolados por `usuarioId` (`RN01`/`C3`), Argon2id (`RNF07`), JWT + refresh rotativo com revogação de família (`CT05`), CSRF double-submit, rate limiting, logger Pino sem PII e suíte bloqueante **Zero IDOR (`CT04`)**.
+  - `apps/web`: Next.js 15 App Router mobile-first (WCAG 2.1 AA) com todos os **35 endpoints REST (`/api/v1/*`)**, Painel de Situação (`F3`), Lançamento Rápido em ≤ 3 interações (`RNF18`), Simulador "E se?" (`RF13`), Histórico Imutável (`RF11`) e Privacidade LGPD (`RF03`).
+- **Visão B (Harness de Engenharia com IA + CI):**
+  - `harness/`: roteador multi-LLM (`M1: gpt-5`, `M2: claude-sonnet-4-5`, `M3: gemini-2.5-flash`), `PathGuard`, `PiiAndSecretScanner`, `BudgetCircuitBreaker` e suíte automatizada de evals `EV01`–`EV04` (`CT06`–`CT08`).
+  - `.github/workflows/`: gates determinísticos de CI (`ci.yml`, `harness-evals.yml`, `release.yml`), `CODEOWNERS`, template de PR rastreável e `.devcontainer` sandbox.
+
+### Como executar localmente
+
+```bash
+pnpm install
+pnpm db:generate
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm dev
+```
+
+- **Conta sintética demonstrativa (`@example.test`, sem precisar subir PostgreSQL):**
+  - E-mail: `ana@example.test` · Senha: `SenhaForte2026`
+- **Para usar PostgreSQL 16 local:** suba `docker compose up -d` e configure `DATABASE_URL` no `.env` (baseado em `.env.example`).

@@ -1,0 +1,4 @@
+{"timestamp":"2026-11-26T12:00:00Z","taskId":"T03","actor":"FDE","decision":"ACEITA","summary":"Adotar aritmética decimal exata com decimal.js (RN07) arredondando apenas na exibição (HALF_UP)"}
+{"timestamp":"2026-11-26T12:05:00Z","taskId":"T03","actor":"FDE","decision":"REJEITADA","summary":"Rejeitada inclusão de assistente de estudo com IA no produto MVP por custo recorrente e política de dados C4"}
+{"timestamp":"2026-11-26T12:30:00Z","taskId":"T33","actor":"Software Engineer","decision":"APROVADO_PLANO_RISCO_A","summary":"Plano do motor @app/domain aprovado com cobertura >= 95% e 6 propriedades fast-check"}
+{"timestamp":"2026-11-26T12:45:00Z","taskId":"T08","actor":"Software Engineer","decision":"APROVADO_PLANO_RISCO_A","summary":"Autenticação Argon2id (m=19MiB, t=2, p=1), refresh rotativo com revogação de família e CSRF double-submit"}
