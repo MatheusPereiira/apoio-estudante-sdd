@@ -3,6 +3,7 @@ node_modules/
 .pnp
 .pnp.js
 .next/
+apps/web/next-env.d.ts
 out/
 dist/
 build/

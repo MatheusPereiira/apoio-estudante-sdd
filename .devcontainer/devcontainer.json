@@ -1,0 +1,22 @@
+{
+  "name": "apoio-estudante-sdd-sandbox",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "node",
+  "workspaceFolder": "/workspace",
+  "postCreateCommand": "pnpm install --frozen-lockfile || pnpm install",
+  "containerEnv": {
+    "NODE_ENV": "development",
+    "SANDBOX_MODE": "true"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "prisma.prisma",
+        "bradlc.vscode-tailwindcss"
+      ]
+    }
+  }
+}

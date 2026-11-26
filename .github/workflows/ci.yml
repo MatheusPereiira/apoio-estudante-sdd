@@ -1,0 +1,45 @@
+name: CI — Gates Determinísticos SDD (T10)
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+jobs:
+  quality-and-security-gates:
+    name: Lint, Typecheck, Domínio, Integração e IDOR (CT01–CT05)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Instalar dependências
+        run: pnpm install
+
+      - name: Gate 1 — ESLint (inclui regra C2 anti-float em @app/domain)
+        run: pnpm lint
+
+      - name: Gate 2 — TypeScript Strict Typecheck
+        run: pnpm typecheck
+
+      - name: Gate 3 — Motor @app/domain (CT01, CT02, 6 propriedades fast-check)
+        run: pnpm test:domain
+
+      - name: Gate 4 — Integração API & Segurança/CSRF (CT03, CT05)
+        run: pnpm test:integration
+
+      - name: Gate 5 — Suíte Bloqueante Zero IDOR (CT04 / RN01)
+        run: pnpm test:idor
+
+      - name: Gate 6 — Build completo (Monorepo + Next.js 15)
+        run: pnpm build

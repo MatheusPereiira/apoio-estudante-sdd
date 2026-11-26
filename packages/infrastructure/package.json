@@ -1,0 +1,34 @@
+{
+  "name": "@app/infrastructure",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:idor": "vitest run test/idor.spec.ts"
+  },
+  "dependencies": {
+    "@app/application": "workspace:*",
+    "@app/contracts": "workspace:*",
+    "@app/domain": "workspace:*",
+    "@prisma/client": "^6.1.0",
+    "hash-wasm": "^4.11.0",
+    "jose": "^5.9.6",
+    "pino": "^9.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
